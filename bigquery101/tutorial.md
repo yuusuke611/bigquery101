@@ -38,14 +38,14 @@ export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 
 ## GCS バケットの作成とファイルのアップロード
 
-### **1.GCS バケットを作成する**
+1. ファイルのアップロード先となるGCS バケットを作成します。
 ```bash
 gcloud storage buckets create gs://${PROJECT_ID}_bigquery_handson --project=$PROJECT_ID --location=us-central1
 ```
 
-### **2.チュートリアル資材のcsvをアップロードする**
+2. 作成したGCSバケットにチュートリアル資材のcsvをアップロードします。
 ```bash
-gcloud storage cp daily_summary_data.csv stream_data.csv gs://${PROJECT_ID}_bigquery_handson
+gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv gs://${PROJECT_ID}_bigquery_handson
 ```
 
 <walkthrough-footnote>ハンズオンに必要なCSVデータをGCSバケットにアップロードすることができました。次にBigQueryへのCSVデータのインポート方法を学びます。</walkthrough-footnote>
@@ -56,21 +56,22 @@ gcloud storage cp daily_summary_data.csv stream_data.csv gs://${PROJECT_ID}_bigq
 
 まずは BigQuery の Dataset を作成します。
 
-1. ナビゲーションメニューから [ **ビッグデータ** ] > [ **BigQuery** ]に移動します。
-2. エクスプローラに表示される自分のProject IDの右側に表示されている縦の”・・・”をクリックし、”**データセットを作成**”を選択します。
-3. [**データセット ID**] と[ **データのロケーション** ]に下記の情報を入力します。
-    - [ データセット ID ] : sales_data
-    - [ データのロケーション ] : us-central1
-4. [ **データセットを作成** ]をクリックします。
-5. エクスプローラの 自分の Project ID の頭にある矢印をクリックするとデータセットが作成されていることが確認できます。
+1. ナビゲーションメニューから [**BigQuery**] に移動します。
+2. エクスプローラペインに表示される自身のProject IDの右側に表示されている縦の”・・・”をクリックし、[**データセットを作成**] を選択します。
+3. [**データセットを作成する**] ペインで下記の情報を入力します。
+    - [データセット ID] : sales_data
+    - [ロケーションタイプ] : リージョン
+    - [データのロケーション] : us-central1
+4. [**データセットを作成**] をクリックします。
+5. エクスプローラの 自身の Project ID を選択し、データセットが作成されていることを確認します。
 
 ## Daily summary data テーブルの作成
 次に、作成した Dataset に新しいテーブルを作成します。
 
-1. Data set (**sales_data**) の横にあるメニューをクリックし、”**テーブルを作成**”をクリックします。
-2. [ **ソース** ]のテーブルの作成元から “**Google Cloud Storage**“を選択します。
-3. [ **参照** ] をクリックして、Cloud Storageから “**daily_summary_data.csv**”ファイルを選択します。
-4. [ **テーブル** ] 名として “**daily_summary_data**” を入力し、[ **スキーマ** ] > [ **テキストとして編集** ] をオンにして下記のように定義します。
+1. エクスプローラーペインで [**sales_data**] の横にあるメニューをクリックし、続いて [**テーブルを作成**] をクリックします。
+2. [**ソース**] の [**テーブルの作成元**] に [**Google Cloud Storage**] を選択します。
+3. [**参照**] をクリックして、Cloud Storageから [**daily_summary_data.csv**] ファイルを選択します。
+4. [**送信先**] の [**テーブル**] の名前に [**daily_summary_data**] を入力し、[**スキーマ**] > [**テキストとして編集**] をオンにして下記のように定義します。
 ```
 [
     {
@@ -115,15 +116,15 @@ gcloud storage cp daily_summary_data.csv stream_data.csv gs://${PROJECT_ID}_bigq
     }
 ]
 ```
-5. [ **テーブルを作成** ] をクリックします。
+5. [**テーブルを作成**] をクリックします。
 
 ## Stream data テーブルの作成
 続けて、もう1つのテーブルを作成します。
 
-1. Data set (**sales_data**) の横にあるメニューをクリックし、”**テーブルを作成**”をクリックします。
-2. [ **ソース** ]のテーブルの作成元から “**Google Cloud Storage**“を選択します。
-3. [ **参照** ] をクリックして、Cloud Storageから “**stream_data.csv**”ファイルを選択します。
-4. [ **テーブル** ] 名として “**stream_data**” を入力し、[ **スキーマ** ] > [ **テキストとして編集** ] をオンにして下記のように定義します。
+1. エクスプローラーペインで [**sales_data**] の横にあるメニューをクリックし、続いて [**テーブルを作成**] をクリックします。
+2. [**ソース**] の [**テーブルの作成元**] に [**Google Cloud Storage**] を選択します。
+3. [**参照**] をクリックして、Cloud Storageから [**stream_data.csv**] ファイルを選択します。
+4. [**送信先**] の [**テーブル**] の名前に [**stream_data**] を入力し、[**スキーマ**] > [**テキストとして編集**] をオンにして下記のように定義します。
 ```
 [
    {
@@ -153,21 +154,20 @@ gcloud storage cp daily_summary_data.csv stream_data.csv gs://${PROJECT_ID}_bigq
    }
 ]
 ```
-5. [ **テーブルを作成** ] をクリックします。
+5. [**テーブルを作成**] をクリックします。
 
 ## BigQuery でテーブルのデータを確認
 作成した2つのテーブルのデータを確認します。
 
 ### **1. Daily summary data テーブルのデータを確認する**
 
-1. ナビゲーション・メニューから [ **BigQuery** ] に移動します。
-2. 画面左から “ **Project名 -> sales_data -> daily_summary_data** ” テーブルを選択します。
-3. [ **プレビュー** ] をクリックします。
+1. エクスプローラーペインから **Project ID** > [**sales_data**] > [**daily_summary_data**] テーブルを選択します。
+2. [**プレビュー**] をクリックします。
 
 ### **2. Stream data テーブルのデータを確認する**
 
-4. 画面左から “ **Project名 -> sales_data -> stream_data** ” テーブルを選択します。
-5. [ **プレビュー** ] をクリックします。
+3. エクスプローラーペインから **Project ID** > [**sales_data**] > [**stream_data**] テーブルを選択します。
+4. [**プレビュー**] をクリックします。
 
 <walkthrough-footnote>BigQUeryへCSVデータをインポートすることができました。次にBigQueryのデータに対するクエリの実行方法を学びます。</walkthrough-footnote>
 
@@ -176,8 +176,8 @@ gcloud storage cp daily_summary_data.csv stream_data.csv gs://${PROJECT_ID}_bigq
 
 2つのテーブルのデータをJOINして集計するクエリを実行します。
 
-1. テーブルの画面から “クエリ” -> “新しいタブ” を選択します。
-2. 下記のSQLを実行して結果を確認します。
+1. テーブルのプレビュー画面から、 [**クエリ**] > [**新しいタブ**] を選択します。
+2. 下記のSQLを入力し、[**実行**] をクリックして実行結果を確認します。
 ```sql
 SELECT a.sub_classification as sub_category
     , count(item_name) as sales_number
@@ -188,15 +188,15 @@ WHERE b.city = "Chiba"
 GROUP BY a.sub_classification
 ```
 
-3. 実行したクエリを保存して、チームへの共有や次回に再利用することができます。”実行”ボタンのとなりにある ”保存”をクリック　→　”クエリを保存”をクリックします。
-4. ”名前”に"**カテゴリ別販売数**"と入力してから”公開設定”を”プロジェクト”を選択してから”保存”をクリックします。
-5. 保存されたクエリはエクスプローラのProjectの下で確認ができます。
+3. 実行したクエリを保存して、チームへの共有や次回に再利用することができます。 [**保存**] をクリックし、続いて [**クエリを保存**] をクリックします。
+4. [**名前**] に [**カテゴリ別販売数**] と入力し、[**保存**] をクリックします。
+5. 保存されたクエリはエクスプローラペインの **Project ID** > [**クエリ**] の下で確認ができます。
 
 ## BigQueryでクエリの定期実行を設定
 次に、定期的にクエリを実行する スケジュールの作成をします。
 
-1. 画面左から “ **Project名 -> 保存したクエリ -> カテゴリ別販売数** ” を選択します。
-2. クエリを以下のように修正します。1行目が追加され、実行結果を別テーブルに保存するようにしています。
+1. エクスプローラーペインから **Project名** > [**クエリ**] > [**カテゴリ別販売数**] を選択します。
+2. クエリを以下のように修正し、[**クエリを保存**] をクリックします。1行目が追加され、実行結果を別テーブルに保存するようにしています。
 ```sql
 CREATE OR REPLACE TABLE `sales_data.daily_items_count_per_sub_category` AS
 SELECT a.sub_classification as sub_category
@@ -207,11 +207,46 @@ INNER JOIN `sales_data.daily_summary_data` as b
 WHERE b.city = "Chiba"
 GROUP BY a.sub_classification
 ```
-3. ”スケジュール”　→　”スケジュールされたクエリを新規作成”をクリックします。
-4. 適切な名前を入れて、時刻を “10:00”（毎日10時実行）に設定します。他はデフォルトのままで保存をクリックするとクエリが実行されます（”すぐに開始”を選択したため）
-5. dataSetの sales_dataのメニューから”コンテンツを更新”をクリックすると先ほど保存したクエリが実行されて、テーブルが作成されていることが確認できます。
+3. [**スケジュール**] をクリックします。APIの有効化を求められた場合は有効化を行います。
+4. **新たにスケジュールされたクエリ** ペインで次のとおり入力します。
+    - [クエリの名前] : (日次)カテゴリ別販売数
+    - [繰り返しの頻度] : 日
+    - [時刻] : 01:00 UTC（日本時間10:00）
+    - [すぐに開始] を選択
+    - [ロケーションタイプ] : リージョン
+    - [リージョン] : us-central1
+5. 他はデフォルトのまま [**保存**] をクリックし、スケジュールを保存します。
+6. すぐに開始 を選択したため、エクスプローラーペインの **Project ID** > [**sales_data**] の下に新しいテーブル [**daily_count_per_subcategory**] が作成されていることが確認できます。
+7. スケジュールされたクエリの実行結果を、ナビゲーションペインの **スケジュールされたクエリ**  から確認します。
 
-<walkthrough-footnote>おめでとうございます！BigQueryのデータに対するクエリの実行方法はこれで完了です。</walkthrough-footnote>
+<walkthrough-footnote>BigQueryのデータに対するクエリの実行方法を学びました。次に、Looker Studioのダッシュボードを用いてBigQueryのデータを可視化します。</walkthrough-footnote>
+
+## Looker StudioでBigQueryのデータを可視化
+<walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
+
+### **1. Looker StudioにBigQueryのデータを追加**
+
+1. [Looker Studio] (https://lookerstudio.google.com/) にアクセスします。
+2. ナビゲーションペインの [**作成**] をクリックし、続いて [**レポート**] をクリックします。
+3. [**データに接続**] セクションで [**BigQuery**] をクリックします。
+    (**データに接続** のペインが表示されていない場合、メニューバーの [**データを追加**] をクリックしてください)
+4. マイプロジェクトからデータソースを次のとおり選択します。
+    - [プロジェクト] : 自身のプロジェクトID
+    - [データセット] : sales_data
+    - [表] : daily_summary_data
+5. [**追加**] をクリックします。続いて [**レポートに追加**] をクリックします。
+
+### **2. Looker Studioにグラフを追加**
+
+6. メニューバーの[**グラフを追加**] > [**棒**] > [**縦棒グラフ**] をクリックします。
+7. 追加されたグラフを選択した状態で、[**グラフ**] ペインでデータの設定をします。
+    - [ディメンション] : store
+    - [指標] : category1
+    - (指標を追加をクリック）指標：category2, category3, category4 を追加
+    - [並べ替え]：store
+8. 追加されたグラフをドラッグして任意の位置に移動します。
+
+<walkthrough-footnote>おめでとうございます！これでLooker Studioのダッシュボードを用いたBigQueryのデータの可視化は完了です。他のテーブルやグラフも自由に追加して試してみてください。</walkthrough-footnote>
 
 ## (Optional) BigQueryからVertex AIへの接続を作成
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
@@ -219,11 +254,11 @@ GROUP BY a.sub_classification
 
 1. 接続を作成するには、エクスプローラペインの [**+データを追加**] をクリックし、続いて [**外部データソースへの接続**] をクリックします。
 2. [**接続タイプ**] リストで、[**Vertex AI リモートモデル、リモート関数、BigLake（Cloud リソース）**] を選択します。
-3. [**接続 ID**] フィールドに**gemini-connect**を入力します。
-4. [**ロケーションタイプ**]で[**リージョン**]を選択し、[**リージョン**]リストで[**us-central1**]を選択します。
+3. [**接続 ID**] フィールドに [**gemini-connect**] を入力します。
+4. [**ロケーションタイプ**] で [**リージョン**] を選択し、[**リージョン**] リストで [**us-central1**] を選択します。
 4. [**接続を作成**] をクリックします。
 5. [**接続へ移動**] をクリックします。
-6. [**接続情報**] ペインで、次の手順で使用する**サービス アカウント ID** をコピーします。
+6. [**接続情報**] ペインで、次の手順で使用する **サービス アカウント ID** をコピーします。
 7. 作成した接続で用いるサービスアカウントにVertex AIへのアクセス権限を付与するため、次のコマンドを実行します。
 ```bash
 gcloud projects add-iam-policy-binding $PROJECT_ID \
@@ -233,7 +268,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 ## (Optional) BigQueryから生成AIモデルGeminiへ接続
 作成したVertex AIへの接続を用いてBigQueryから生成AIモデルGeminiへ接続します。
 
-1. [**SQLクエリを作成**]をクリックして新しいタブを開き、以下のSQLを実行します。
+1. [**SQLクエリを作成**] をクリックして新しいタブを開き、以下のSQLを実行します。
 ```sql
 CREATE OR REPLACE MODEL sales_data.gemini_pro
   REMOTE WITH CONNECTION `us-central1.gemini-connect`
@@ -262,13 +297,38 @@ FROM ML.GENERATE_TEXT(
 ```
 
 ## (Optional) 顧客の声データを生成AIを用いて分析
-BigQuery上で生成AIモデルに接続することで、大量のデータの分析を行います。
+BigQuery上で生成AIモデルに接続することで、顧客の声データの分析を行います。
+
+### **1.顧客の声データのテーブル作成**
+1. エクスプローラーペインで [**sales_data**] の横にあるメニューをクリックし、続いて [**テーブルを作成**] をクリックします。
+2. [**ソース**] の [**テーブルの作成元**] に [**Google Cloud Storage**] を選択します。
+3. [**参照**] をクリックして、Cloud Storageから [**customer_voice_data.csv**] ファイルを選択します。
+4. [**送信先**] の [**テーブル**] の名前に [**customer_voice_data**] を入力し、[**スキーマ**] > [**テキストとして編集**] をオンにして下記のように定義します。
+```
+[
+   {
+       "name": "store",
+       "type": "STRING",
+       "mode": "NULLABLE"
+   },
+   {
+       "name": "customer_voice",
+       "type": "STRING",
+       "mode": "NULLABLE"
+   }
+]
+```
+5. [**テーブルを作成**] をクリックします。
+6. エクスプローラーペインで [**sales_data**] > [**customer_voice_data**] を選択し、[**プレビュー**] をクリックします。
+
+### **2.顧客の声データの分析**
+7. [**クエリ**] > [**新しいタブ**] をクリックし、次のSQLを入力して [**実行**] をクリックします。 
 ```sql
 CREATE or REPLACE TABLE sales_data.customer_voice_category_data AS
 SELECT 
-  ml_generate_text_result['candidates'][0]['content']['parts'][0]['text'] as category,
   customer_voice,
-  store
+  store,  
+  ml_generate_text_result['candidates'][0]['content']['parts'][0]['text'] as category
 FROM ML.GENERATE_TEXT(
     MODEL sales_data.gemini_pro,
     (SELECT 
@@ -284,3 +344,6 @@ FROM ML.GENERATE_TEXT(
     STRUCT(1000 as max_output_tokens, 0.2 as temperature)
   )
 ```
+8. エクスプローラーペインで [**sales_data**] > [**customer_voice_category_data**] を選択し、[**プレビュー**] をクリックします。
+
+<walkthrough-footnote>おめでとうございます！生成AIモデルGemini Proを用いた顧客の声データの分析ができました。作成したテーブルをLooker Studioのダッシュボードに追加することも自由に試してみてください。</walkthrough-footnote>
