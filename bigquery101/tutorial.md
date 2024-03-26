@@ -1,7 +1,7 @@
 # はじめてのBigQueryハンズオン
 
 ## ハンズオンの概要
-このラボでは、分析するデータ(CSVファイル)を Cloud Storageへアップロードして、BigQueryへ ImportしてからLooker Studioのダッシュボードに表示させます。
+このラボでは、分析するデータ(CSV ファイル)を Cloud Storage へアップロードして、BigQuery へ Import してから Looker Studio のダッシュボードに表示させます。
 
 データは2つの種類を準備します。1日の店舗別の売上をまとめた店舗別売上情報と実際の店舗等で売上が発生した時に発生する売上の個別のデータです。
 
@@ -9,7 +9,6 @@
 * CSV ファイルを Cloud Storage にアップロードします。
 * CSV ファイルを BigQuery へインポートします。
 * Looker Studio で売上ダッシュボードを作成します。
-
 
 Header  | Header 2
 ------- | --------
