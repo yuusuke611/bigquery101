@@ -12,7 +12,8 @@
 
 ## ハンズオンの開始
 <walkthrough-tutorial-duration duration=5></walkthrough-tutorial-duration>
-ハンズオンに利用するファイルをダウンロードします。既に実施済の手順はスキップしてください。
+ハンズオンに利用するファイルをダウンロードします。既に実施済の手順はスキップすることができます。
+
 Cloud Shell 
 <walkthrough-cloud-shell-icon></walkthrough-cloud-shell-icon> を開き、次のコマンドを実行します。
 
@@ -51,7 +52,9 @@ gcloud storage buckets create gs://${PROJECT_ID}_bigquery_handson --project=$PRO
 gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv gs://${PROJECT_ID}_bigquery_handson
 ```
 
-ハンズオンに必要なCSVデータをGCSバケットにアップロードすることができました。次にBigQueryへのCSVデータのインポート方法を学びます。
+ハンズオンに必要なCSVデータをGCSバケットにアップロードすることができました。
+
+次にBigQueryへのCSVデータのインポート方法を学びます。
 
 ## BigQuery の Dataset 準備
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
@@ -61,7 +64,9 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 
 1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**BigQuery**] に移動します。
 <walkthrough-menu-navigation sectionId="BIGQUERY_SECTION"></walkthrough-menu-navigation>
-2. エクスプローラペインに表示される自身のプロジェクト ID の右側に表示されている **︙** をクリックし、[**データセットを作成**] を選択します。
+2. エクスプローラペインに表示される自身のプロジェクト ID の右側に表示されている
+<walkthrough-spotlight-pointer locator="semantic({treeitem 'cloud-llm-preview1'} {button 'View actions'})">**︙**(三点リーダー)</walkthrough-spotlight-pointer> をクリックし、[**データセットを作成**] を選択します。
+ 
 3. [**データセットを作成する**] ペインで下記の情報を入力します。
 
   フィールド  | 値
@@ -177,7 +182,9 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 3. エクスプローラーペインから **プロジェクト ID** > [**sales_data**] > [**stream_data**] テーブルを選択します。
 4. [**プレビュー**] をクリックします。
 
-BigQUery へ CSV データをインポートすることができました。次に BigQuery のデータに対するクエリの実行方法を学びます。
+BigQUery へ CSV データをインポートすることができました。
+
+次に BigQuery のデータに対するクエリの実行方法を学びます。
 
 ## BigQueryで簡単なクエリを実行
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
@@ -220,9 +227,9 @@ GROUP BY a.sub_classification
 
 フィールド | 値
 ---------------- | ----------------
-クエリの名前 | `(日次)カテゴリ別販売数`
+クエリの名前 | `日次カテゴリ別販売数`
 繰り返しの頻度 | 日
-時刻 | `01:00 UTC`（日本時間10:00）
+時刻 | `01:00`
 すぐに開始 | 選択する
 ロケーションタイプ | リージョン
 リージョン | `us-central1`
@@ -231,34 +238,45 @@ GROUP BY a.sub_classification
 6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > [**sales_data**] の下に新しいテーブル `daily_count_per_subcategory` が作成されていることが確認できます。
 7. スケジュールされたクエリの実行結果を、ナビゲーションペインの **スケジュールされたクエリ**  から確認します。
 
-BigQuery のデータに対するクエリの実行方法を学びました。次に、Looker Studio のダッシュボードを用いて BigQuery のデータを可視化します。
+BigQuery のデータに対するクエリの実行方法を学びました。
 
-## Looker StudioでBigQueryのデータを可視化
+次に、Looker Studio のダッシュボードを用いて BigQuery のデータを可視化します。
+
+## Looker StudioにBigQueryのデータを追加
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
 
-### **1. Looker StudioにBigQueryのデータを追加**
+まず、Looker Studio に可視化したい BigQuery のデータを追加します。
 
 1. [Looker Studio](https://lookerstudio.google.com/) にアクセスします。
 2. ナビゲーションペインの [**作成**] をクリックし、続いて [**レポート**] をクリックします。
 3. [**データに接続**] セクションで [**BigQuery**] をクリックします。
     (**データに接続** のペインが表示されていない場合、メニューバーの [**データを追加**] をクリックしてください)
 4. マイプロジェクトからデータソースを次のとおり選択します。
-    - [プロジェクト] : 自身のプロジェクトID
-    - [データセット] : `sales_data`
-    - [表] : `daily_summary_data`
+
+フィールド | 値
+---------------- | ----------------
+プロジェクト | プロジェクトID
+データセット | `sales_data`
+表 | `daily_summary_data`
+
 5. [**追加**] をクリックします。続いて [**レポートに追加**] をクリックします。
 
-### **2. Looker Studioにグラフを追加**
+## Looker Studioにグラフを追加
 
-6. メニューバーの[**グラフを追加**] > [**棒**] > [**縦棒グラフ**] をクリックします。
-7. 追加されたグラフを選択した状態で、[**グラフ**] ペインでデータの設定をします。
-    - [ディメンション] : store
-    - [指標] : category1
-    - (指標を追加をクリック）指標：category2, category3, category4 を追加
-    - [並べ替え]：store
-8. 追加されたグラフをドラッグして任意の位置に移動します。
+続いて、追加したデータを元に Looker Studio にグラフを追加します。
 
-<walkthrough-footnote>おめでとうございます！これでLooker Studioのダッシュボードを用いたBigQueryのデータの可視化は完了です。他のテーブルやグラフも自由に追加して試してみてください。</walkthrough-footnote>
+1. メニューバーの[**グラフを追加**] > [**棒**] > [**縦棒グラフ**] をクリックします。
+2. 追加されたグラフを選択した状態で、[**グラフ**] ペインでデータの設定をします。
+
+フィールド | 値
+---------------- | ----------------
+ディメンション | `store`
+指標 | `category1`, `category2`, `category3`, `category4`
+並べ替え | `store`
+
+3. 追加されたグラフをドラッグして任意の位置に移動します。
+
+おめでとうございます！これでLooker Studioのダッシュボードを用いたBigQueryのデータの可視化は完了です。他のテーブルやグラフも自由に追加して試してみてください。
 
 ## (Optional) BigQueryからVertex AIへの接続を作成
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
@@ -266,9 +284,15 @@ BigQuery のデータに対するクエリの実行方法を学びました。�
 
 1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**BigQuery**] に移動します。
 1. 接続を作成するには、エクスプローラペインの [**+データを追加**] をクリックし、続いて [**外部データソースへの接続**] をクリックします。
-2. [**接続タイプ**] リストで、[**Vertex AI リモートモデル、リモート関数、BigLake（Cloud リソース）**] を選択します。
-3. [**接続 ID**] フィールドに `gemini-connect` を入力します。
-4. [**ロケーションタイプ**] で [**リージョン**] を選択し、[**リージョン**] リストで `us-central1` を選択します。
+2. **外部データソース** ペインで、次の情報を入力します。
+
+フィールド | 値
+--- | ---
+接続タイプ | **Vertex AI リモートモデル、リモート関数、BigLake（Cloud リソース）**
+接続 ID | `gemini-connect`
+ロケーションタイプ | **リージョン**
+リージョン | `us-central1`
+
 4. [**接続を作成**] をクリックします。
 5. [**接続へ移動**] をクリックします。
 6. [**接続情報**] ペインで、次の手順で使用する **サービス アカウント ID** をコピーします。
