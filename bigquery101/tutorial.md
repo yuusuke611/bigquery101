@@ -65,7 +65,7 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**BigQuery**] に移動します。
 <walkthrough-menu-navigation sectionId="BIGQUERY_SECTION"></walkthrough-menu-navigation>
 2. エクスプローラペインに表示される自身のプロジェクト ID の右側に表示されている
-<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-dataset-explorer-resource-list] [id$='_1rif_cfc-labelledby-message-goog_947600195']" single="true">**︙**(三点リーダー)</walkthrough-spotlight-pointer> をクリックし、[**データセットを作成**] を選択します。
+<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-dataset-explorer-resource-list] button.node-context-menu" single="true">**︙**(三点リーダー)</walkthrough-spotlight-pointer> をクリックし、[**データセットを作成**] を選択します。
  
 3. [**データセットを作成する**] ペインで下記の情報を入力します。
 
