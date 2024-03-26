@@ -10,10 +10,21 @@
 - CSV ファイルを BigQuery へインポートします。
 - Looker Studio で売上ダッシュボードを作成します。
 
+<walkthrough-project-setup></walkthrough-project-setup>
+
+<walkthrough-project-id/>
+
+<walkthrough-project-name/>
+
+<walkthrough-project-id-no-domain/>
+
+<walkthrough-project-number/>
+
 ## ハンズオンの開始
 <walkthrough-tutorial-duration duration=5></walkthrough-tutorial-duration>
-ハンズオンに利用するファイルをダウンロードします。
-既に実施済の手順はスキップすることができます。
+ハンズオンに利用するファイルをダウンロードします。既に実施済の手順はスキップしてください。
+Cloud Shell 
+<walkthrough-open-cloud-shell-button></walkthrough-open-cloud-shell-button> を開き、次のコマンドを実行します。
 
 ### **1. チュートリアル資材をダウンロードする**
 ```bash
@@ -36,9 +47,11 @@ teachme tutorial.md
 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 ```
 
+**Tips**: コードボックスの横にあるボタンをクリックすることで、クリップボードへのコピーおよび Cloud Shell へのコピーが簡単に行えます。
+
 ## GCS バケットの作成とファイルのアップロード
 
-1. ファイルのアップロード先となるGCS バケットを作成します。
+1. ファイルのアップロード先となる GCS バケットを作成します。
 ```bash
 gcloud storage buckets create gs://${PROJECT_ID}_bigquery_handson --project=$PROJECT_ID --location=us-central1
 ```
@@ -52,11 +65,11 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 
 ## BigQuery の Dataset 準備
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
-ここからはより直感的に理解しやすいようCloud Console上で操作を行います。
+ここからはより直感的に理解しやすいよう Cloud Console 上で操作を行います。
 
 まずは BigQuery の Dataset を作成します。
 
-1. ナビゲーションメニューから [**BigQuery**] に移動します。
+1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から <walkthrough-menu-navigation sectionId="BIGQUERY_SECTION">[**BigQuery**]</walkthrough-menu-navigation> に移動します。
 2. エクスプローラペインに表示される自身のProject IDの右側に表示されている縦の”・・・”をクリックし、[**データセットを作成**] を選択します。
 3. [**データセットを作成する**] ペインで下記の情報を入力します。
     - [データセット ID] : sales_data
@@ -346,4 +359,8 @@ FROM ML.GENERATE_TEXT(
 ```
 8. エクスプローラーペインで [**sales_data**] > [**customer_voice_category_data**] を選択し、[**プレビュー**] をクリックします。
 
+<walkthrough-conclusion-trophy></walkthrough-conclusion-trophy>
+
 <walkthrough-footnote>おめでとうございます！生成AIモデルGemini Proを用いた顧客の声データの分析ができました。作成したテーブルをLooker Studioのダッシュボードに追加することも自由に試してみてください。</walkthrough-footnote>
+
+<walkthrough-inline-feedback></walkthrough-inline-feedback>
