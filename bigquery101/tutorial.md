@@ -1,14 +1,15 @@
 # はじめてのBigQueryハンズオン
 
 ## ハンズオンの概要
-このラボでは、分析するデータ(CSV ファイル)を Cloud Storage へアップロードして、BigQuery へ Import してから Looker Studio のダッシュボードに表示させます。
+このラボでは、分析するデータ (CSV ファイル) を Cloud Storage へアップロードして、BigQuery へ Import してから Looker Studio のダッシュボードに表示させます。
 
-データは2つの種類を準備します。1日の店舗別の売上をまとめた店舗別売上情報と実際の店舗等で売上が発生した時に発生する売上の個別のデータです。
+データは3つの種類を準備しています。1日の店舗別の売上をまとめた店舗別売上情報、店舗で実際に発生した売上の個別データ、そして店舗に寄せられたお客様からの声のデータです。
 
 このラボの内容：
 * CSV ファイルを Cloud Storage にアップロードします。
 * CSV ファイルを BigQuery へインポートします。
 * Looker Studio で売上ダッシュボードを作成します。
+* (Optional) BigQuery から生成AIモデル Gemini Pro を呼び出してお客様の声を分析します。
 
 ## ハンズオンの開始
 <walkthrough-tutorial-duration duration=5></walkthrough-tutorial-duration>
@@ -65,7 +66,7 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**BigQuery**] に移動します。
 <walkthrough-menu-navigation sectionId="BIGQUERY_SECTION"></walkthrough-menu-navigation>
 2. エクスプローラペインに表示される自身のプロジェクト ID の右側に表示されている
-<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-dataset-explorer-resource-list] button.node-context-menu" single="true">**︙**(三点リーダー)</walkthrough-spotlight-pointer> をクリックし、[**データセットを作成**] を選択します。
+<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-dataset-explorer-resource-list] button.node-context-menu" single="true">︙ (三点リーダー)</walkthrough-spotlight-pointer> をクリックし、[**データセットを作成**] を選択します。
  
 3. [**データセットを作成する**] ペインで下記の情報を入力します。
 
@@ -204,13 +205,13 @@ GROUP BY a.sub_classification
 ```
 
 3. 実行したクエリを保存して、チームへの共有や次回に再利用することができます。 [**保存**] をクリックし、続いて [**クエリを保存**] をクリックします。
-4. [**名前**] に [**カテゴリ別販売数**] と入力し、[**保存**] をクリックします。
+4. [**名前**] に `カテゴリ別販売数` と入力し、[**保存**] をクリックします。
 5. 保存されたクエリはエクスプローラペインの **プロジェクト ID** > [**クエリ**] の下で確認ができます。
 
 ## BigQueryでクエリの定期実行を設定
 次に、定期的にクエリを実行する スケジュールの作成をします。
 
-1. エクスプローラーペインから **プロジェクト ID** > [**クエリ**] > [**カテゴリ別販売数**] を選択します。
+1. エクスプローラーペインから **プロジェクト ID** > [**クエリ**] > `カテゴリ別販売数` を選択します。
 2. クエリを以下のように修正し、[**クエリを保存**] をクリックします。1行目が追加され、実行結果を別テーブルに保存するようにしています。
 ```sql
 CREATE OR REPLACE TABLE `sales_data.daily_items_count_per_sub_category` AS
@@ -235,7 +236,7 @@ GROUP BY a.sub_classification
 リージョン | `us-central1`
 
 5. 他はデフォルトのまま [**保存**] をクリックし、スケジュールを保存します。
-6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > [**sales_data**] の下に新しいテーブル `daily_count_per_subcategory` が作成されていることが確認できます。
+6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > [**sales_data**] の下に新しいテーブル `daily_items_count_per_subcategory` が作成されていることが確認できます。
 7. スケジュールされたクエリの実行結果を、ナビゲーションペインの **スケジュールされたクエリ**  から確認します。
 
 BigQuery のデータに対するクエリの実行方法を学びました。
@@ -249,8 +250,10 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 
 1. [Looker Studio](https://lookerstudio.google.com/) にアクセスします。
 2. ナビゲーションペインの [**作成**] をクリックし、続いて [**レポート**] をクリックします。
+アカウントの設定画面が表示される場合には画面に従って入力してください。
+
 3. [**データに接続**] セクションで [**BigQuery**] をクリックします。
-    (**データに接続** のペインが表示されていない場合、メニューバーの [**データを追加**] をクリックしてください)
+アクセス権を求められた場合は承認してください。
 4. マイプロジェクトからデータソースを次のとおり選択します。
 
 フィールド | 値
@@ -305,6 +308,11 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 ## (Optional) BigQueryから生成AIモデルGeminiへ接続
 作成したVertex AIへの接続を用いてBigQueryから生成AIモデルGeminiへ接続します。
 
+1. Vertex AI を有効化するため、次のコマンドを実行します。
+```bash
+gcloud services enable aiplatform.googleapis.com
+```
+
 1. [**SQLクエリを作成**] をクリックして新しいタブを開き、以下のSQLを実行します。
 ```sql
 CREATE OR REPLACE MODEL sales_data.gemini_pro
@@ -325,7 +333,7 @@ FROM ML.GENERATE_TEXT(
 Gemini Proからのレスポンスがjson型であることを確認します。
 BigQueryではjson型のデータを次のようなクエリで展開することが可能です。
 ```sql
-SELECT ml_generate_text_result['candidates'][0]['content']['parts'][0]['text'] as response
+SELECT JSON_VALUE(ml_generate_text_result.candidates[0].content.parts[0].text) as response
 FROM ML.GENERATE_TEXT(
     MODEL sales_data.gemini_pro,
     (SELECT 'Google Cloud Nextについて教えてください' AS prompt),
@@ -365,7 +373,7 @@ CREATE or REPLACE TABLE sales_data.customer_voice_category_data AS
 SELECT 
   customer_voice,
   store,  
-  ml_generate_text_result['candidates'][0]['content']['parts'][0]['text'] as category
+  JSON_VALUE(ml_generate_text_result.candidates[0].content.parts[0].text) as category
 FROM ML.GENERATE_TEXT(
     MODEL sales_data.gemini_pro,
     (SELECT 
@@ -385,7 +393,7 @@ FROM ML.GENERATE_TEXT(
 
 生成AIモデルGemini Proを用いた顧客の声データの分析ができました。作成したテーブルをLooker Studioのダッシュボードに追加することも自由に試してみてください。
 
-## Congratulations!
+# Congratulations!
 <walkthrough-conclusion-trophy></walkthrough-conclusion-trophy>
 
-<walkthrough-footnote>おめでとうございます！ハンズオンはこれで完了です。ご参加ありがとうございました。</walkthrough-footnote>
+おめでとうございます！ハンズオンはこれで完了です。ご参加ありがとうございました。
