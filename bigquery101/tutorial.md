@@ -10,24 +10,11 @@
 * CSV ファイルを BigQuery へインポートします。
 * Looker Studio で売上ダッシュボードを作成します。
 
-Header  | Header 2
-------- | --------
-Cell 00 | Cell 01
-Cell 10 | Cell 11
-
-<walkthrough-project-id/>
-
-<walkthrough-project-name/>
-
-<walkthrough-project-id-no-domain/>
-
-<walkthrough-project-number/>
-
 ## ハンズオンの開始
 <walkthrough-tutorial-duration duration=5></walkthrough-tutorial-duration>
 ハンズオンに利用するファイルをダウンロードします。既に実施済の手順はスキップしてください。
 Cloud Shell 
-<walkthrough-open-cloud-shell-button></walkthrough-open-cloud-shell-button> を開き、次のコマンドを実行します。
+<walkthrough-cloud-shell-icon></walkthrough-cloud-shell-icon> を開き、次のコマンドを実行します。
 
 ### **1. チュートリアル資材をダウンロードする**
 ```bash
@@ -64,7 +51,7 @@ gcloud storage buckets create gs://${PROJECT_ID}_bigquery_handson --project=$PRO
 gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv gs://${PROJECT_ID}_bigquery_handson
 ```
 
-<walkthrough-footnote>ハンズオンに必要なCSVデータをGCSバケットにアップロードすることができました。次にBigQueryへのCSVデータのインポート方法を学びます。</walkthrough-footnote>
+ハンズオンに必要なCSVデータをGCSバケットにアップロードすることができました。次にBigQueryへのCSVデータのインポート方法を学びます。
 
 ## BigQuery の Dataset 準備
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
@@ -72,12 +59,16 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 
 まずは BigQuery の Dataset を作成します。
 
-1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から <walkthrough-menu-navigation sectionId="BIGQUERY_SECTION">[**BigQuery**]</walkthrough-menu-navigation> に移動します。
+1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から <walkthrough-menu-navigation sectionId="BIGQUERY_SECTION">BigQuery</walkthrough-menu-navigation> に移動します。
 2. エクスプローラペインに表示される自身のProject IDの右側に表示されている縦の”・・・”をクリックし、[**データセットを作成**] を選択します。
 3. [**データセットを作成する**] ペインで下記の情報を入力します。
-    - [データセット ID] : sales_data
-    - [ロケーションタイプ] : リージョン
-    - [データのロケーション] : us-central1
+
+  フィールド  | 値
+  ------- | --------
+  データセット ID | `sales_data`
+  ロケーションタイプ | リージョン
+  データのロケーション | `us-central1`
+
 4. [**データセットを作成**] をクリックします。
 5. エクスプローラの 自身の Project ID を選択し、データセットが作成されていることを確認します。
 
