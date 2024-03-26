@@ -6,11 +6,15 @@
 データは2つの種類を準備します。1日の店舗別の売上をまとめた店舗別売上情報と実際の店舗等で売上が発生した時に発生する売上の個別のデータです。
 
 このラボの内容：
-- CSV ファイルを Cloud Storage にアップロードします。
-- CSV ファイルを BigQuery へインポートします。
-- Looker Studio で売上ダッシュボードを作成します。
+* CSV ファイルを Cloud Storage にアップロードします。
+* CSV ファイルを BigQuery へインポートします。
+* Looker Studio で売上ダッシュボードを作成します。
 
-<walkthrough-project-setup></walkthrough-project-setup>
+
+Header  | Header 2
+------- | --------
+Cell 00 | Cell 01
+Cell 10 | Cell 11
 
 <walkthrough-project-id/>
 
