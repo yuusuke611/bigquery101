@@ -78,7 +78,7 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
 4. [**データセットを作成**] をクリックします。
 5. エクスプローラペインの自身のプロジェクト ID を選択し、データセット `bq_handson` が作成されていることを確認します。
 
-## Daily summary data テーブルの作成
+## Store data テーブルの作成
 次に、作成した Dataset に新しいテーブルを作成します。
 
 1. エクスプローラーペインで `bq_handson` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
@@ -99,26 +99,6 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
         "mode": "NULLABLE"
     },
     {
-        "name": "category1",
-        "type": "NUMERIC",
-        "mode": "NULLABLE"
-    },
-    {
-        "name": "category2",
-        "type": "NUMERIC",
-        "mode": "NULLABLE"
-    },
-    {
-        "name": "category3",
-        "type": "NUMERIC",
-        "mode": "NULLABLE"
-    },
-    {
-        "name": "category4",
-        "type": "NUMERIC",
-        "mode": "NULLABLE"
-    },
-    {
         "name": "lat_long",
         "type": "STRING",
         "mode": "NULLABLE"
@@ -132,7 +112,7 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
 ```
 6. [**テーブルを作成**] をクリックします。
 
-## Stream data テーブルの作成
+## Sales data テーブルの作成
 続けて、もう1つのテーブルを作成します。
 
 1. エクスプローラーペインで `bq_handson` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
@@ -174,12 +154,12 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
 ## BigQuery でテーブルのデータを確認
 作成した2つのテーブルのデータをプレビューで確認します。
 
-### **1. Daily summary data テーブルのデータを確認する**
+### **1. Store data テーブルのデータを確認する**
 
 1. エクスプローラーペインから **プロジェクト ID** > `bq_handson` > `store_data` テーブルを選択します。
 2. [**プレビュー**] をクリックします。
 
-### **2. Stream data テーブルのデータを確認する**
+### **2. Sales data テーブルのデータを確認する**
 
 3. エクスプローラーペインから **プロジェクト ID** > `bq_handson` > `sales_data` テーブルを選択します。
 4. [**プレビュー**] をクリックします。
@@ -191,45 +171,47 @@ BigQUery へ CSV データをインポートすることができました。
 ## BigQueryで簡単なクエリを実行
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
 
-2つのテーブルのデータを JOIN して集計するクエリを実行します。
+2つのテーブルのデータを JOIN して、商品カテゴリーごとの売上を集計するクエリを実行します。
 
 1. テーブルのプレビュー画面から、 [**クエリ**] > [**新しいタブ**] を選択します。
 2. 下記の SQL を入力し、[**実行**] をクリックして実行結果を確認します。
 ```sql
-SELECT a.sub_classification as sub_category
-    , count(item_name) as sales_number
+SELECT
+    a.classification as category,
+    count(item_name) as sales_number,
+    sum(price) as sales_amount
  FROM `bq_handson.sales_data` as a
 INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
-WHERE b.city = "Chiba"
-GROUP BY a.sub_classification
+GROUP BY a.classification
 ```
 
 3. 実行したクエリを保存して、チームへの共有や次回に再利用することができます。 [**保存**] をクリックし、続いて [**クエリを保存**] をクリックします。
-4. [**名前**] に `カテゴリ別販売数` と入力し、[**保存**] をクリックします。
+4. [**名前**] に `カテゴリ別販売データ` と入力し、[**保存**] をクリックします。
 5. 保存されたクエリはエクスプローラペインの **プロジェクト ID** > [**クエリ**] の下で確認ができます。
 
 ## BigQueryでクエリの定期実行を設定
 次に、定期的にクエリを実行する スケジュールの作成をします。
 
-1. エクスプローラーペインから **プロジェクト ID** > [**クエリ**] > `カテゴリ別販売数` を選択します。
+1. エクスプローラーペインから **プロジェクト ID** > [**クエリ**] > `カテゴリ別販売データ` を選択します。
 2. クエリを以下のように修正し、[**クエリを保存**] をクリックします。1行目が追加され、実行結果を別テーブルに保存するようにしています。
 ```sql
-CREATE OR REPLACE TABLE `bq_handson.daily_items_count_per_sub_category` AS
-SELECT a.sub_classification as sub_category
-    , count(item_name) as sales_number
+CREATE OR REPLACE TABLE `bq_handson.daily_sales_data_per_category` AS
+SELECT
+    a.classification as category,
+    count(item_name) as sales_number,
+    sum(price) as sales_amount
  FROM `bq_handson.sales_data` as a
 INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
-WHERE b.city = "Chiba"
-GROUP BY a.sub_classification
+GROUP BY a.classification
 ```
 3. [**スケジュール**] をクリックします。API の有効化を求められた場合は有効化を行います。
 4. **新たにスケジュールされたクエリ** ペインで次のとおり入力します。
 
 フィールド | 値
 ---------------- | ----------------
-クエリの名前 | `日次カテゴリ別販売数`
+クエリの名前 | `日次カテゴリ別販売データ`
 繰り返しの頻度 | 日
 時刻 | `01:00`
 すぐに開始 | 選択する
@@ -239,6 +221,33 @@ GROUP BY a.sub_classification
 5. 他はデフォルトのまま [**保存**] をクリックし、スケジュールを保存します。
 6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > `bq_handson` の下に新しいテーブル `daily_items_count_per_subcategory` が作成されていることが確認できます。
 7. スケジュールされたクエリの実行結果を、ナビゲーションペインの **スケジュールされたクエリ**  から確認します。
+
+## (Optional) Gemini in BigQuery を用いてデータを探索
+ここでは、Gemini のアシスタント機能を使用してデータ探索を行う方法を学びます。
+
+まず、Gemini in BigQuery を有効化します。
+
+1. BigQuery Studio のクエリエディタで、<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button[name=addTabButton]" single="true">[SQL クエリを作成] アイコン</walkthrough-spotlight-pointer> をクリックします。
+
+2. クエリエディタの横にある <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button#_3rif_Gemini" single="true">[コーディングをサポート] アイコン</walkthrough-spotlight-pointer> をクリックします。
+
+次に、Gemini を用いて SQL クエリを生成します。
+
+1. [**コーディングをサポート**]ツールで、次のプロンプトを入力します。
+```
+神奈川にある店舗の販売金額トップ10の商品とそのカテゴリ、サブカテゴリを調べるクエリを書いて
+```
+2. [**生成**] をクリックします。
+  Gemini は、次のような SQL クエリを生成します。
+```terminal
+sssss
+```
+
+<walkthrough-info-message>
+注: Gemini は、同じプロンプトに対して異なる SQL クエリを提案する場合があります。
+</walkthrough-info-message>
+
+3. 生成された SQL クエリを受け入れるには、[**挿入**] をクリックして、クエリエディタにステートメントを挿入します。[**実行**] をクリックして、提案された SQL クエリを実行します。
 
 BigQuery のデータに対するクエリの実行方法を学びました。
 
@@ -257,6 +266,8 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 アクセス権を求められた場合は承認してください。
 4. マイプロジェクトからデータソースを次のとおり選択します。
 
+TODO: 集計結果を読み込むように変更
+
 フィールド | 値
 ---------------- | ----------------
 プロジェクト | プロジェクトID
@@ -271,6 +282,8 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 
 1. メニューバーの[**グラフを追加**] > [**棒**] > [**縦棒グラフ**] をクリックします。
 2. 追加されたグラフを選択した状態で、[**グラフ**] ペインでデータの設定をします。
+
+TODO: グラフを変更
 
 フィールド | 値
 ---------------- | ----------------
