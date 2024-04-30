@@ -3,7 +3,7 @@
 ## ハンズオンの概要
 このラボでは、分析するデータ (CSV ファイル) を Cloud Storage へアップロードして、BigQuery へ Import してから Looker Studio のダッシュボードに表示させます。
 
-データは3つの種類を準備しています。1日の店舗別の売上をまとめた店舗別売上情報、店舗で実際に発生した売上の個別データ、そして店舗に寄せられたお客様からの声のデータです。
+データは3つの種類を準備しています。店舗の住所などをまとめた店舗情報データ、店舗で実際に発生した売上の個別データ、そして店舗に寄せられたお客様からの声のデータです。
 
 このラボの内容：
 * CSV ファイルを Cloud Storage にアップロードします。
@@ -38,9 +38,7 @@ teachme tutorial.md
 ```bash
 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 ```
-<walkthrough-info-message>
-**Tips**: コードボックスの横にあるボタンをクリックすることで、クリップボードへのコピーおよび Cloud Shell へのコピーが簡単に行えます。
-</walkthrough-info-message>
+<walkthrough-info-message>**Tips:** コードボックスの横にあるボタンをクリックすることで、クリップボードへのコピーおよび Cloud Shell へのコピーが簡単に行えます。</walkthrough-info-message>
 
 ## GCS バケットの作成とファイルのアップロード
 
@@ -66,8 +64,8 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
 
 1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**BigQuery**] に移動します。
 <walkthrough-menu-navigation sectionId="BIGQUERY_SECTION"></walkthrough-menu-navigation>
-2. エクスプローラペインに表示される自身の **プロジェクト ID** の右側に表示されている
-<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-dataset-explorer-resource-list] button.node-context-menu" single="true">︙ (三点リーダー)</walkthrough-spotlight-pointer> をクリックし、[**データセットを作成**] を選択します。
+2. エクスプローラペインの **自身の プロジェクト ID** の右側に表示されている
+<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-dataset-explorer-resource-list] button.node-context-menu" single="true">**︙ (三点リーダー)**</walkthrough-spotlight-pointer> をクリックし、[**データセットを作成**] を選択します。
 3. [**データセットを作成する**] ペインで下記の情報を入力します。
 
   フィールド  | 値
@@ -77,7 +75,7 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
   データのロケーション | `us-central1`
 
 4. [**データセットを作成**] をクリックします。
-5. エクスプローラペインの自身のプロジェクト ID を選択し、データセット `bq_handson` が作成されていることを確認します。
+5. エクスプローラペインの自身のプロジェクト ID の下に、データセット `bq_handson` が作成されていることを確認します。
 
 ## Store data テーブルの作成
 次に、作成した Dataset に新しいテーブルを作成します。
@@ -158,7 +156,7 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
 ### **1. Store data テーブルのデータを確認する**
 
 1. エクスプローラーペインから **プロジェクト ID** > `bq_handson` > `store_data` テーブルを選択します。
-2. [**プレビュー**] をクリックします。
+2. <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-table-preview-tab]" single="true">[**プレビュー**]</walkthrough-spotlight-pointer> をクリックします。
 
 ### **2. Sales data テーブルのデータを確認する**
 
@@ -186,19 +184,20 @@ SELECT
 INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
 GROUP BY a.store, a.classification
+ORDER BY 1,2
 ```
 
 3. 実行したクエリを保存して、チームへの共有や次回に再利用することができます。 [**保存**] をクリックし、続いて [**クエリを保存**] をクリックします。
-4. [**名前**] に `カテゴリ別販売データ` と入力し、[**保存**] をクリックします。
+4. [**名前**] に `販売サマリー` と入力し、[**保存**] をクリックします。
 5. 保存されたクエリはエクスプローラペインの **プロジェクト ID** > [**クエリ**] の下で確認ができます。
 
 ## BigQueryでクエリの定期実行を設定
 次に、定期的にクエリを実行する スケジュールの作成をします。
 
-1. エクスプローラーペインから **プロジェクト ID** > [**クエリ**] > `カテゴリ別販売データ` を選択します。
+1. エクスプローラーペインから **プロジェクト ID** > [**クエリ**] > `販売サマリー` を選択します。
 2. クエリを以下のように修正し、[**クエリを保存**] をクリックします。1行目が追加され、実行結果を別テーブルに保存するようにしています。
 ```sql
-CREATE OR REPLACE TABLE `bq_handson.daily_sales_data_per_category` AS
+CREATE OR REPLACE TABLE `bq_handson.daily_sales_summary` AS
 SELECT
     a.store,
     a.classification as category,
@@ -208,26 +207,27 @@ SELECT
 INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
 GROUP BY a.store, a.classification
+ORDER BY 1,2
 ```
-3. [**スケジュール**] をクリックします。API の有効化を求められた場合は有効化を行います。
+3. [**スケジュール**] をクリックします。
 4. **新たにスケジュールされたクエリ** ペインで次のとおり入力します。
 
 フィールド | 値
 ---------------- | ----------------
-クエリの名前 | `日次カテゴリ別販売データ`
+クエリの名前 | `日次販売サマリー`
 繰り返しの頻度 | 日
 時刻 | `01:00`
 すぐに開始 | 選択する
 ロケーションタイプ | リージョン
 リージョン | `us-central1`
 
-5. 他はデフォルトのまま [**保存**] をクリックし、スケジュールを保存します。
+5. 他はデフォルトのまま [**保存**] をクリックし、スケジュールを保存します。認証を求められた場合は、ハンズオン用のユーザーを選んで認証します。
 6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > `bq_handson` の下に新しいテーブル `daily_items_count_per_subcategory` が作成されていることが確認できます。
 7. スケジュールされたクエリの実行結果を、ナビゲーションペインの **スケジュールされたクエリ**  から確認します。
 
 BigQuery のデータに対するクエリの実行方法を学びました。
 
-## (Optional) Gemini in BigQuery を用いてデータを探索
+## (Optional) Gemini in BigQuery の有効化
 ここでは、Gemini のアシスタント機能を使用してデータ探索を行う方法を学びます。
 
 まず、Gemini in BigQuery を有効化します。
@@ -238,6 +238,8 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 
 3. [**Cloud AI Companion API**] が無効になっている場合は [**有効にする**] をクリックし、[**閉じる**] をクリックします。
 
+## (Optional) Gemini in BigQuery を用いてデータを探索
+
 次に、Gemini を用いて SQL クエリを生成します。
 
 1. <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button[name=addTabButton]" single="true">[**SQL クエリを作成**] アイコン</walkthrough-spotlight-pointer> をクリックして、新しいタブを開きます。
@@ -246,22 +248,29 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 
 3. 次のプロンプトを入力します。
 ```
-bq_handsonデータセットから、神奈川にある店舗の販売金額トップ10の商品とそのカテゴリ、サブカテゴリを調べるクエリを書いて
+bq_handsonデータセットから、販売金額トップ10の商品とそのカテゴリ、サブカテゴリを調べるクエリを書いて
 ```
 
 4. [**生成**] をクリックします。
   Gemini は、次のような SQL クエリを生成します。
 ```terminal
-TODO:Geminiが生成したSQLクエリのサンプルを記載
+SELECT
+    t1.item_name,
+    t1.classification,
+    t1.sub_classification,
+    t1.price
+  FROM
+    bq_handson.sales_data AS t1
+ORDER BY
+  t1.price DESC
+LIMIT 10
 ```
 
-<walkthrough-info-message>
-**注:** Gemini は、同じプロンプトに対して異なる SQL クエリを提案する場合があります。
-</walkthrough-info-message>
+<walkthrough-info-message>**注:** Gemini は、同じプロンプトに対して異なる SQL クエリを提案する場合があります。</walkthrough-info-message>
 
 3. 生成された SQL クエリを受け入れるには、[**挿入**] をクリックして、クエリエディタにステートメントを挿入します。[**実行**] をクリックして、提案された SQL クエリを実行します。
 
-次に、Looker Studio のダッシュボードを用いて BigQuery のデータを可視化します。
+Gemini in BigQuery のアシスタント機能を学びました。これ以外のプロンプトも自由に試してみてください。
 
 ## Looker Studio に BigQuery のデータを追加
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
@@ -269,8 +278,10 @@ TODO:Geminiが生成したSQLクエリのサンプルを記載
 まず、Looker Studio に可視化したい BigQuery のデータを追加します。
 
 1. [Looker Studio](https://lookerstudio.google.com/) にアクセスします。
+
 2. ナビゲーションペインの [**作成**] をクリックし、続いて [**レポート**] をクリックします。
-アカウントの設定画面が表示される場合には画面に従って入力してください。
+
+2. アカウントの設定画面が表示された場合は、画面に従って入力してください。
 
 3. [**データに接続**] セクションで [**BigQuery**] をクリックします。
 アクセス権を求められた場合は承認してください。
@@ -280,7 +291,7 @@ TODO:Geminiが生成したSQLクエリのサンプルを記載
 ---------------- | ----------------
 プロジェクト | プロジェクトID
 データセット | `bq_handson`
-表 | `daily_sales_data_per_category`
+表 | `daily_sales_summary`
 
 5. [**追加**] をクリックします。続いて [**レポートに追加**] をクリックします。
 
@@ -291,13 +302,11 @@ TODO:Geminiが生成したSQLクエリのサンプルを記載
 1. メニューバーの[**グラフを追加**] > [**棒**] > [**縦棒グラフ**] をクリックします。
 2. 追加されたグラフを選択した状態で、[**グラフ**] ペインでデータの設定をします。
 
-TODO: グラフを変更
-
 フィールド | 値
 ---------------- | ----------------
 ディメンション | `store`
-指標 | `category1`, `category2`, `category3`, `category4`
-並べ替え | `store`
+内部ディメンション | `category`
+指標 | (SUM)`sales_amount`
 
 3. 追加されたグラフをドラッグして任意の位置に移動します。
 
@@ -306,6 +315,8 @@ TODO: グラフを変更
 ## (Optional) BigQueryからVertex AIへの接続を作成
 <walkthrough-tutorial-duration duration=15></walkthrough-tutorial-duration>
 この項目はスキップしても構いません。BigQuery から Vertex AI への接続方法を学びます。
+
+まず、BigQuery から Vertex AI への接続を作成します。
 
 1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**BigQuery**] に移動します。
 1. 接続を作成するには、エクスプローラペインの [**+データを追加**] をクリックし、続いて [**外部データソースへの接続**] をクリックします。
@@ -321,16 +332,28 @@ TODO: グラフを変更
 4. [**接続を作成**] をクリックします。
 5. [**接続へ移動**] をクリックします。
 6. [**接続情報**] ペインで、次の手順で使用する **サービス アカウント ID** をコピーします。
-7. 作成した接続で用いるサービスアカウントに Vertex AI へのアクセス権限を付与するため、次のコマンドを実行します。**コマンドを実行する前に、REPLACEME の部分を前の手順でコピーしたサービスアカウントIDに書き換えてください。**
-```bash
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member=serviceAccount:REPLACEME --role=roles/aiplatform.user --condition=None
-```
+
+## (Optional) Vertex AIへの接続で用いるサービスアカウントにアクセス権限を付与
+
+次に、作成した接続で用いるサービスアカウントにアクセス権限 (IAM) を付与します。
+
+1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**IAMと管理**] > [**IAM**] に移動します。
+
+2. [**アクセス権を付与**] をクリックします。
+
+3. [**新しいプリンシパル**] に、前の手順でコピーしたアカウント ID を入力します。
+
+4. [**ロールを選択**] をクリックし、[**Vertex AI**] > [**Vertex AI ユーザー**] を選択します。
+
+5. [**作成**] をクリックし、アクセス権を付与します。
 
 ## (Optional) BigQueryから生成AIモデルGeminiへ接続
-作成した Vertex AI への接続を用いて BigQuery から生成 AI モデル Gemini Pro へ接続します。
+続いて、作成した接続を用いて BigQuery から生成 AI モデル Gemini Pro へ接続します。
+
+1. ナビゲーションメニュー <walkthrough-nav-menu-icon></walkthrough-nav-menu-icon> から [**BigQuery**] に移動します。
 
 1. Vertex AI を有効化するため、次のコマンドを実行します。
+
 ```bash
 gcloud services enable aiplatform.googleapis.com
 ```
@@ -401,15 +424,15 @@ FROM ML.GENERATE_TEXT(
     MODEL bq_handson.gemini_pro,
     (SELECT 
       CONCAT(
-        '次の顧客の声を分類してください。分類は次のいずれかを選んでください。¥n¥n',
-        '商品・品揃え、価格、スタッフ、店舗環境、その他。¥n¥n',
-        '顧客の声:',
+        '次の[顧客の声]を分類して、[出力形式]に従って出力してください。¥n¥n',
+        '[出力形式]商品・品揃え、価格、スタッフ、店舗環境、その他、のいずれか1つをプレーンテキストで出力。余計な情報は付加しないこと。¥n¥n',
+        '[顧客の声]',
         customer_voice
      ) AS prompt,
      customer_voice,
      store
      FROM `bq_handson.customer_voice_data`),
-    STRUCT(1000 as max_output_tokens, 0.2 as temperature)
+    STRUCT(1000 as max_output_tokens, 0.0 as temperature)
   )
 ```
 8. エクスプローラーペインで `bq_handson` > `customer_voice_category_data` を選択し、[**プレビュー**] をクリックします。
