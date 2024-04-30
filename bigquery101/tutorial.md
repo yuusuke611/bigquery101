@@ -38,8 +38,9 @@ teachme tutorial.md
 ```bash
 export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 ```
-
+<walkthrough-info-message>
 **Tips**: コードボックスの横にあるボタンをクリックすることで、クリップボードへのコピーおよび Cloud Shell へのコピーが簡単に行えます。
+</walkthrough-info-message>
 
 ## GCS バケットの作成とファイルのアップロード
 
@@ -104,7 +105,7 @@ gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${P
         "mode": "NULLABLE"
     },
     {
-        "name": "city",
+        "name": "prefecture",
         "type": "STRING",
         "mode": "NULLABLE"
     }
@@ -173,17 +174,18 @@ BigQUery へ CSV データをインポートすることができました。
 
 2つのテーブルのデータを JOIN して、商品カテゴリーごとの売上を集計するクエリを実行します。
 
-1. テーブルのプレビュー画面から、 [**クエリ**] > [**新しいタブ**] を選択します。
+1. <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button[name=addTabButton]" single="true">[**SQL クエリを作成**] アイコン</walkthrough-spotlight-pointer> をクリックして、新しいタブを開きます。
 2. 下記の SQL を入力し、[**実行**] をクリックして実行結果を確認します。
 ```sql
 SELECT
+    a.store,
     a.classification as category,
     count(item_name) as sales_number,
     sum(price) as sales_amount
  FROM `bq_handson.sales_data` as a
 INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
-GROUP BY a.classification
+GROUP BY a.store, a.classification
 ```
 
 3. 実行したクエリを保存して、チームへの共有や次回に再利用することができます。 [**保存**] をクリックし、続いて [**クエリを保存**] をクリックします。
@@ -198,13 +200,14 @@ GROUP BY a.classification
 ```sql
 CREATE OR REPLACE TABLE `bq_handson.daily_sales_data_per_category` AS
 SELECT
+    a.store,
     a.classification as category,
     count(item_name) as sales_number,
     sum(price) as sales_amount
  FROM `bq_handson.sales_data` as a
 INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
-GROUP BY a.classification
+GROUP BY a.store, a.classification
 ```
 3. [**スケジュール**] をクリックします。API の有効化を求められた場合は有効化を行います。
 4. **新たにスケジュールされたクエリ** ペインで次のとおり入力します。
@@ -222,34 +225,41 @@ GROUP BY a.classification
 6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > `bq_handson` の下に新しいテーブル `daily_items_count_per_subcategory` が作成されていることが確認できます。
 7. スケジュールされたクエリの実行結果を、ナビゲーションペインの **スケジュールされたクエリ**  から確認します。
 
+BigQuery のデータに対するクエリの実行方法を学びました。
+
 ## (Optional) Gemini in BigQuery を用いてデータを探索
 ここでは、Gemini のアシスタント機能を使用してデータ探索を行う方法を学びます。
 
 まず、Gemini in BigQuery を有効化します。
 
-1. BigQuery Studio のクエリエディタで、<walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button[name=addTabButton]" single="true">[SQL クエリを作成] アイコン</walkthrough-spotlight-pointer> をクリックします。
+1. クエリエディタの横にある <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button#_3rif_Gemini" single="true">[**Gemini**] アイコン</walkthrough-spotlight-pointer> にマウスカーソルを合わせ、表示されたツールチップの [**続行**] をクリックします。
 
-2. クエリエディタの横にある <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button#_3rif_Gemini" single="true">[コーディングをサポート] アイコン</walkthrough-spotlight-pointer> をクリックします。
+2. [**Geminiを有効にする**]ペインで、Trusted Tester プログラムに関する利用規約への同意にチェックを入れ、[**次へ**] をクリックします。
+
+3. [**Cloud AI Companion API**] が無効になっている場合は [**有効にする**] をクリックし、[**閉じる**] をクリックします。
 
 次に、Gemini を用いて SQL クエリを生成します。
 
-1. [**コーディングをサポート**]ツールで、次のプロンプトを入力します。
+1. <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button[name=addTabButton]" single="true">[**SQL クエリを作成**] アイコン</walkthrough-spotlight-pointer> をクリックして、新しいタブを開きます。
+
+2. <walkthrough-spotlight-pointer cssSelector="sqe-duet-trigger-overlay" single="true">[**コーディングをサポート**]アイコン</walkthrough-spotlight-pointer> をクリックするか、Ctrl + Shift + P を入力して、[**コーディングをサポート**]ツールを開きます。
+
+3. 次のプロンプトを入力します。
 ```
-神奈川にある店舗の販売金額トップ10の商品とそのカテゴリ、サブカテゴリを調べるクエリを書いて
+bq_handsonデータセットから、神奈川にある店舗の販売金額トップ10の商品とそのカテゴリ、サブカテゴリを調べるクエリを書いて
 ```
-2. [**生成**] をクリックします。
+
+4. [**生成**] をクリックします。
   Gemini は、次のような SQL クエリを生成します。
 ```terminal
-sssss
+TODO:Geminiが生成したSQLクエリのサンプルを記載
 ```
 
 <walkthrough-info-message>
-注: Gemini は、同じプロンプトに対して異なる SQL クエリを提案する場合があります。
+**注:** Gemini は、同じプロンプトに対して異なる SQL クエリを提案する場合があります。
 </walkthrough-info-message>
 
 3. 生成された SQL クエリを受け入れるには、[**挿入**] をクリックして、クエリエディタにステートメントを挿入します。[**実行**] をクリックして、提案された SQL クエリを実行します。
-
-BigQuery のデータに対するクエリの実行方法を学びました。
 
 次に、Looker Studio のダッシュボードを用いて BigQuery のデータを可視化します。
 
@@ -266,13 +276,11 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 アクセス権を求められた場合は承認してください。
 4. マイプロジェクトからデータソースを次のとおり選択します。
 
-TODO: 集計結果を読み込むように変更
-
 フィールド | 値
 ---------------- | ----------------
 プロジェクト | プロジェクトID
 データセット | `bq_handson`
-表 | `store_data`
+表 | `daily_sales_data_per_category`
 
 5. [**追加**] をクリックします。続いて [**レポートに追加**] をクリックします。
 
