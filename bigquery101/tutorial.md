@@ -50,7 +50,7 @@ gcloud storage buckets create gs://${PROJECT_ID}_bigquery_handson --project=$PRO
 
 2. 作成した GCS バケットにチュートリアル資材の CSV をアップロードします。
 ```bash
-gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv gs://${PROJECT_ID}_bigquery_handson
+gcloud storage cp store_data.csv sales_data.csv customer_voice_data.csv gs://${PROJECT_ID}_bigquery_handson
 ```
 
 ハンズオンに必要な CSV データを GCS バケットにアップロードすることができました。
@@ -71,20 +71,20 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 
   フィールド  | 値
   ------- | --------
-  データセット ID | `sales_data`
+  データセット ID | `bq_handson`
   ロケーションタイプ | リージョン
   データのロケーション | `us-central1`
 
 4. [**データセットを作成**] をクリックします。
-5. エクスプローラペインの自身のプロジェクト ID を選択し、データセット `sales_data` が作成されていることを確認します。
+5. エクスプローラペインの自身のプロジェクト ID を選択し、データセット `bq_handson` が作成されていることを確認します。
 
 ## Daily summary data テーブルの作成
 次に、作成した Dataset に新しいテーブルを作成します。
 
-1. エクスプローラーペインで `sales_data` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
+1. エクスプローラーペインで `bq_handson` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
 2. [**ソース**] の [**テーブルの作成元**] に [**Google Cloud Storage**] を選択します。
-3. [**参照**] をクリックして、Cloud Storage から [**daily_summary_data.csv**] ファイルを選択します。
-4. [**送信先**] の [**テーブル**] の名前に `daily_summary_data` を入力します。
+3. [**参照**] をクリックして、Cloud Storage から [**store_data.csv**] ファイルを選択します。
+4. [**送信先**] の [**テーブル**] の名前に `store_data` を入力します。
 5. [**スキーマ**] > [**テキストとして編集**] をオンにして下記のように定義します。
 ```
 [
@@ -135,10 +135,10 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 ## Stream data テーブルの作成
 続けて、もう1つのテーブルを作成します。
 
-1. エクスプローラーペインで `sales_data` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
+1. エクスプローラーペインで `bq_handson` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
 2. [**ソース**] の [**テーブルの作成元**] に [**Google Cloud Storage**] を選択します。
-3. [**参照**] をクリックして、Cloud Storage から [**stream_data.csv**] ファイルを選択します。
-4. [**送信先**] の [**テーブル**] の名前に `stream_data` を入力します。
+3. [**参照**] をクリックして、Cloud Storage から [**sales_data.csv**] ファイルを選択します。
+4. [**送信先**] の [**テーブル**] の名前に `sales_data` を入力します。
 5. [**スキーマ**] > [**テキストとして編集**] をオンにして下記のように定義します。
 ```
 [
@@ -176,12 +176,12 @@ gcloud storage cp daily_summary_data.csv stream_data.csv customer_voice_data.csv
 
 ### **1. Daily summary data テーブルのデータを確認する**
 
-1. エクスプローラーペインから **プロジェクト ID** > `sales_data` > `daily_summary_data` テーブルを選択します。
+1. エクスプローラーペインから **プロジェクト ID** > `bq_handson` > `store_data` テーブルを選択します。
 2. [**プレビュー**] をクリックします。
 
 ### **2. Stream data テーブルのデータを確認する**
 
-3. エクスプローラーペインから **プロジェクト ID** > `sales_data` > `stream_data` テーブルを選択します。
+3. エクスプローラーペインから **プロジェクト ID** > `bq_handson` > `sales_data` テーブルを選択します。
 4. [**プレビュー**] をクリックします。
 
 BigQUery へ CSV データをインポートすることができました。
@@ -198,8 +198,8 @@ BigQUery へ CSV データをインポートすることができました。
 ```sql
 SELECT a.sub_classification as sub_category
     , count(item_name) as sales_number
- FROM `sales_data.stream_data` as a
-INNER JOIN `sales_data.daily_summary_data` as b
+ FROM `bq_handson.sales_data` as a
+INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
 WHERE b.city = "Chiba"
 GROUP BY a.sub_classification
@@ -215,11 +215,11 @@ GROUP BY a.sub_classification
 1. エクスプローラーペインから **プロジェクト ID** > [**クエリ**] > `カテゴリ別販売数` を選択します。
 2. クエリを以下のように修正し、[**クエリを保存**] をクリックします。1行目が追加され、実行結果を別テーブルに保存するようにしています。
 ```sql
-CREATE OR REPLACE TABLE `sales_data.daily_items_count_per_sub_category` AS
+CREATE OR REPLACE TABLE `bq_handson.daily_items_count_per_sub_category` AS
 SELECT a.sub_classification as sub_category
     , count(item_name) as sales_number
- FROM `sales_data.stream_data` as a
-INNER JOIN `sales_data.daily_summary_data` as b
+ FROM `bq_handson.sales_data` as a
+INNER JOIN `bq_handson.store_data` as b
    ON a.store = b.store
 WHERE b.city = "Chiba"
 GROUP BY a.sub_classification
@@ -237,7 +237,7 @@ GROUP BY a.sub_classification
 リージョン | `us-central1`
 
 5. 他はデフォルトのまま [**保存**] をクリックし、スケジュールを保存します。
-6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > `sales_data` の下に新しいテーブル `daily_items_count_per_subcategory` が作成されていることが確認できます。
+6. すぐに開始 を選択したため、エクスプローラーペインの **プロジェクト ID** > `bq_handson` の下に新しいテーブル `daily_items_count_per_subcategory` が作成されていることが確認できます。
 7. スケジュールされたクエリの実行結果を、ナビゲーションペインの **スケジュールされたクエリ**  から確認します。
 
 BigQuery のデータに対するクエリの実行方法を学びました。
@@ -260,8 +260,8 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 フィールド | 値
 ---------------- | ----------------
 プロジェクト | プロジェクトID
-データセット | `sales_data`
-表 | `daily_summary_data`
+データセット | `bq_handson`
+表 | `store_data`
 
 5. [**追加**] をクリックします。続いて [**レポートに追加**] をクリックします。
 
@@ -316,7 +316,7 @@ gcloud services enable aiplatform.googleapis.com
 
 1. [**SQLクエリを作成**] をクリックして新しいタブを開き、以下の SQL を実行します。
 ```sql
-CREATE OR REPLACE MODEL sales_data.gemini_pro
+CREATE OR REPLACE MODEL bq_handson.gemini_pro
   REMOTE WITH CONNECTION `us-central1.gemini-connect`
   OPTIONS(ENDPOINT = 'gemini-pro')
 ```
@@ -325,7 +325,7 @@ CREATE OR REPLACE MODEL sales_data.gemini_pro
 ```sql
 SELECT ml_generate_text_result as response
 FROM ML.GENERATE_TEXT(
-    MODEL sales_data.gemini_pro,
+    MODEL bq_handson.gemini_pro,
     (SELECT 'Google Cloud Nextについて教えてください' AS prompt),
     STRUCT(1000 as max_output_tokens, 0.2 as temperature)
   )
@@ -336,7 +336,7 @@ BigQuery では json 型のデータを次のようなクエリで展開する�
 ```sql
 SELECT JSON_VALUE(ml_generate_text_result.candidates[0].content.parts[0].text) as response
 FROM ML.GENERATE_TEXT(
-    MODEL sales_data.gemini_pro,
+    MODEL bq_handson.gemini_pro,
     (SELECT 'Google Cloud Nextについて教えてください' AS prompt),
     STRUCT(1000 as max_output_tokens, 0.2 as temperature)
   )
@@ -346,7 +346,7 @@ FROM ML.GENERATE_TEXT(
 BigQuery 上で生成 AI モデルに接続することで、顧客の声データの分析を行います。
 
 ### **1.顧客の声データのテーブル作成**
-1. エクスプローラーペインで `sales_data` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
+1. エクスプローラーペインで `bq_handson` の横にある **︙** をクリックし、続いて [**テーブルを作成**] をクリックします。
 2. [**ソース**] の [**テーブルの作成元**] に [**Google Cloud Storage**] を選択します。
 3. [**参照**] をクリックして、Cloud Storage から [**customer_voice_data.csv**] ファイルを選択します。
 4. [**送信先**] の [**テーブル**] の名前に `customer_voice_data` を入力します。
@@ -366,18 +366,18 @@ BigQuery 上で生成 AI モデルに接続することで、顧客の声デー�
 ]
 ```
 6. [**テーブルを作成**] をクリックします。
-7. エクスプローラーペインで `sales_data` > `customer_voice_data` を選択し、[**プレビュー**] をクリックします。
+7. エクスプローラーペインで `bq_handson` > `customer_voice_data` を選択し、[**プレビュー**] をクリックします。
 
 ### **2.顧客の声データの分析**
 7. [**クエリ**] > [**新しいタブ**] をクリックし、次の SQL を入力して [**実行**] をクリックします。 
 ```sql
-CREATE or REPLACE TABLE sales_data.customer_voice_category_data AS
+CREATE or REPLACE TABLE bq_handson.customer_voice_category_data AS
 SELECT 
   customer_voice,
   store,  
   JSON_VALUE(ml_generate_text_result.candidates[0].content.parts[0].text) as category
 FROM ML.GENERATE_TEXT(
-    MODEL sales_data.gemini_pro,
+    MODEL bq_handson.gemini_pro,
     (SELECT 
       CONCAT(
         '次の顧客の声を分類してください。分類は次のいずれかを選んでください。¥n¥n',
@@ -387,11 +387,11 @@ FROM ML.GENERATE_TEXT(
      ) AS prompt,
      customer_voice,
      store
-     FROM `sales_data.customer_voice_data`),
+     FROM `bq_handson.customer_voice_data`),
     STRUCT(1000 as max_output_tokens, 0.2 as temperature)
   )
 ```
-8. エクスプローラーペインで `sales_data` > `customer_voice_category_data` を選択し、[**プレビュー**] をクリックします。
+8. エクスプローラーペインで `bq_handson` > `customer_voice_category_data` を選択し、[**プレビュー**] をクリックします。
 
 生成AIモデル Gemini Pro を用いた顧客の声データの分析ができました。作成したテーブルを Looker Studio のダッシュボードに追加することも自由に試してみてください。
 
