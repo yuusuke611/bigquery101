@@ -37,7 +37,7 @@ product_names = {
 
 stores = ['六本木店', '渋谷店', '横浜店']
 
-with open('stream_data.csv', 'w', newline='') as csvfile:
+with open('sales_data.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     # writer.writerow(['カテゴリ', 'サブカテゴリ', '商品名', '売上金額', '店舗名'])
     for _ in range(1000):
