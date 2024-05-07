@@ -232,7 +232,7 @@ BigQuery のデータに対するクエリの実行方法を学びました。
 
 まず、Gemini in BigQuery を有効化します。
 
-1. クエリエディタの横にある <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button#_3rif_Gemini" single="true">[**Gemini**] アイコン</walkthrough-spotlight-pointer> にマウスカーソルを合わせ、表示されたツールチップの [**続行**] をクリックします。
+1. クエリエディタの横にある <walkthrough-spotlight-pointer cssSelector="[instrumentationid=bq-sql-code-editor] button#_1rif_Gemini" single="true">[**Gemini**] アイコン</walkthrough-spotlight-pointer> にマウスカーソルを合わせ、表示されたツールチップの [**続行**] をクリックします。
 
 2. [**Geminiを有効にする**]ペインで、Trusted Tester プログラムに関する利用規約への同意にチェックを入れ、[**次へ**] をクリックします。
 
@@ -254,15 +254,17 @@ bq_handsonデータセットから、販売金額トップ10の商品とその�
 4. [**生成**] をクリックします。
   Gemini は、次のような SQL クエリを生成します。
 ```terminal
+-- bq_handsonデータセットから、販売金額トップ10の商品とそのカテゴリ、サブカテゴリを調べるクエリを書いて
 SELECT
     t1.item_name,
     t1.classification,
     t1.sub_classification,
-    t1.price
+    sum(t1.price) AS total_sales
   FROM
     bq_handson.sales_data AS t1
+  GROUP BY 1, 2, 3
 ORDER BY
-  t1.price DESC
+  total_sales DESC
 LIMIT 10
 ```
 
@@ -345,7 +347,7 @@ Gemini in BigQuery のアシスタント機能を学びました。これ以外�
 
 4. [**ロールを選択**] をクリックし、[**Vertex AI**] > [**Vertex AI ユーザー**] を選択します。
 
-5. [**作成**] をクリックし、アクセス権を付与します。
+5. [**保存**] をクリックし、アクセス権を付与します。
 
 ## (Optional) BigQueryから生成AIモデルGeminiへ接続
 続いて、作成した接続を用いて BigQuery から生成 AI モデル Gemini Pro へ接続します。
