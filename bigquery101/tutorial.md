@@ -20,12 +20,12 @@ Cloud Shell
 
 ### **1. チュートリアル資材をダウンロードする**
 ```bash
-git clone https://github.com/tichiba/googlecloud.git
+git clone https://github.com/yuusuke611/bigquery101.git
 ```
 
 ### **2. チュートリアル資材があるディレクトリに移動する**
 ```bash
-cd ~/googlecloud/bigquery101
+cd ./bigquery101/bigquery101
 ```
 
 ### **3. チュートリアルを開く**
